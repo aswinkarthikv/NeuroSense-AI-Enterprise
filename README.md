@@ -86,8 +86,8 @@ NeuroSense-AI/
 ## ⚙️ Installation
 
 ```bash
-git clone https://github.com/yourusername/NeuroSense-AI.git
-cd NeuroSense-AI
+git clone https://github.com/aswinkarthikv/NeuroSense-AI-Enterprise.git
+cd NeuroSense-AI-Enterprise
 pip install -r requirements.txt
 python scripts/seed_enterprise_data.py
 python run_server.py
