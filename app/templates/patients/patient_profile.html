@@ -1,0 +1,116 @@
+{% extends "layouts/admin_layout.html" %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div class="flex items-center space-x-4">
+        <a href="/patients" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-colors shadow-sm">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div>
+            <div class="flex items-center space-x-3">
+                <h2 class="text-2xl font-bold text-slate-800 tracking-tight">{{ patient.user.first_name }} {{ patient.user.last_name }}</h2>
+                {% if patient.baseline_risk_score > 70 %}
+                    <span class="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-700 text-xs font-bold uppercase tracking-wider">High Risk</span>
+                {% elif patient.baseline_risk_score > 40 %}
+                    <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold uppercase tracking-wider">Medium Risk</span>
+                {% else %}
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold uppercase tracking-wider">Low Risk</span>
+                {% endif %}
+            </div>
+            <p class="text-slate-500 font-mono text-sm mt-0.5">UUID: {{ patient.id }}</p>
+        </div>
+    </div>
+    <div class="flex space-x-3">
+        <a href="/assessments/new?patient_id={{ patient.id }}" class="bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200 flex items-center">
+            <i class="fas fa-stethoscope mr-2"></i> Start Diagnostic Session
+        </a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Demographics Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden lg:col-span-1 border-t-4 border-t-indigo-500">
+        <div class="p-6">
+            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest mb-4">Clinical Profile</h3>
+            <div class="space-y-4">
+                <div class="flex justify-between border-b border-slate-50 pb-3">
+                    <span class="text-slate-500 text-sm">Date of Birth</span>
+                    <span class="text-slate-800 font-medium text-sm">{{ patient.date_of_birth.strftime('%b %d, %Y') }}</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-50 pb-3">
+                    <span class="text-slate-500 text-sm">Gender</span>
+                    <span class="text-slate-800 font-medium text-sm">{{ patient.gender }}</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-50 pb-3">
+                    <span class="text-slate-500 text-sm">Registration Date</span>
+                    <span class="text-slate-800 font-medium text-sm">{{ patient.user.created_at.strftime('%Y-%m-%d') }}</span>
+                </div>
+                
+                <div class="pt-2">
+                    <span class="text-slate-500 text-sm block mb-2">Medical History Notes:</span>
+                    <div class="p-3 bg-slate-50 rounded-lg text-sm text-slate-600 italic">
+                        "{{ patient.medical_history }}"
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Trajectory -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 lg:col-span-2">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest">Temporal Risk Analysis</h3>
+            <button class="text-indigo-600 text-sm font-medium hover:text-indigo-800"><i class="fas fa-expand-alt mr-1"></i> Expand AI Details</button>
+        </div>
+        <div class="p-6">
+            <div class="relative h-64 w-full">
+                <!-- Same chart ID since main.js initializes it, but we could customize per patient -->
+                <canvas id="riskTrajectoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Historical Assessments Table -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="p-6 border-b border-slate-100">
+        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest">Historical AI Diagnostics Archive</h3>
+    </div>
+    <div class="overflow-x-auto text-left">
+        <table class="w-full border-collapse">
+            <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-semibold tracking-wider">
+                <tr>
+                    <th class="py-3 px-6 border-b border-slate-200">Session ID</th>
+                    <th class="py-3 px-6 border-b border-slate-200">Date Completed</th>
+                    <th class="py-3 px-6 border-b border-slate-200">Voice</th>
+                    <th class="py-3 px-6 border-b border-slate-200">Handwriting</th>
+                    <th class="py-3 px-6 border-b border-slate-200">Gait</th>
+                    <th class="py-3 px-6 border-b border-slate-200 font-bold text-indigo-900">Fusion Score</th>
+                    <th class="py-3 px-6 border-b border-slate-200 text-right">PDF Report</th>
+                </tr>
+            </thead>
+            <tbody id="patient-assessments-body" class="text-sm text-slate-700 divide-y divide-slate-100 bg-white">
+                <!-- Handled via Python Jinja or JS depending on scale, using Jinja here for instant render -->
+                {% set sorted_assessments = patient.assessments.all() | sort(attribute='session_date', reverse=True) %}
+                {% for ass in sorted_assessments %}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="py-4 px-6 font-mono text-xs text-slate-500">{{ ass.id.split('-')[0] }}***</td>
+                    <td class="py-4 px-6 font-medium">{{ ass.session_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="py-4 px-6">{{ '%.1f'|format(ass.voice_risk_score) if ass.voice_risk_score else 'N/A' }}%</td>
+                    <td class="py-4 px-6">{{ '%.1f'|format(ass.handwriting_risk_score) if ass.handwriting_risk_score else 'N/A' }}%</td>
+                    <td class="py-4 px-6">{{ '%.1f'|format(ass.gait_risk_score) if ass.gait_risk_score else 'N/A' }}%</td>
+                    <td class="py-4 px-6 font-bold text-indigo-700">{{ '%.1f'|format(ass.composite_risk_score) if ass.composite_risk_score else 'Processing' }}%</td>
+                    <td class="py-4 px-6 text-right">
+                        <a href="/assessments/{{ ass.id }}/pdf" class="text-rose-500 hover:text-rose-700 transition-colors inline-block" title="Download PDF Report" target="_blank">
+                            <i class="fas fa-file-pdf text-xl"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="p-8 text-center text-slate-400">No assessments found for this patient.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

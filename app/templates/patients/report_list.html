@@ -1,0 +1,68 @@
+{% extends "layouts/admin_layout.html" %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-end">
+    <div>
+        <h2 class="text-3xl font-bold text-slate-800 tracking-tight">Clinical Reports Archive</h2>
+        <p class="text-slate-500 mt-1">A massive repository of all Multimodal AI Assessment results.</p>
+    </div>
+    <div class="flex space-x-3">
+        <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200">
+            <i class="fas fa-file-export mr-2"></i> Export CSV Index
+        </button>
+    </div>
+</div>
+
+<div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 overflow-hidden relative">
+    <div class="p-6 border-b border-white/40 bg-white/40 flex justify-between items-center">
+        <div class="flex space-x-2">
+            <button class="filter-btn px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-sm font-medium rounded hover:bg-slate-50 shadow-sm" data-filter="all">All Reports</button>
+            <button class="filter-btn px-3 py-1.5 bg-transparent border border-transparent text-slate-600 text-sm font-medium rounded hover:bg-slate-200" data-filter="high">Critical Risks</button>
+        </div>
+        <div>
+            <span class="text-sm font-medium text-slate-500">Showing <span class="text-slate-800 font-bold">{{ assessments|length }}</span> Processed Reports</span>
+        </div>
+    </div>
+    <div class="overflow-x-auto h-[600px] overflow-y-auto custom-scrollbar">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-slate-50/80 backdrop-blur-md sticky top-0 z-10 text-slate-500 uppercase text-xs font-bold tracking-wider border-b border-slate-200/50 shadow-sm">
+                <tr>
+                    <th class="py-4 px-6">Report ID</th>
+                    <th class="py-4 px-6">Date Computed</th>
+                    <th class="py-4 px-6">Patient UUID</th>
+                    <th class="py-4 px-6">Patient Name</th>
+                    <th class="py-4 px-6">AI Composite Risk</th>
+                    <th class="py-4 px-6 text-right">Download PDF</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm text-slate-700 divide-y divide-slate-100/50 bg-white/40">
+                {% for ass in assessments %}
+                <tr class="hover:bg-slate-50/80 transition-colors">
+                    <td class="py-4 px-6 font-mono text-xs text-slate-500">{{ ass.id.split('-')[0] }}***</td>
+                    <td class="py-4 px-6 font-medium text-slate-600">{{ ass.session_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="py-4 px-6 font-mono text-xs text-slate-400">{{ ass.patient.id.split('-')[0] }}...</td>
+                    <td class="py-4 px-6 font-bold text-slate-700">{{ ass.patient.user.first_name }} {{ ass.patient.user.last_name }}</td>
+                    <td class="py-4 px-6">
+                        {% set score = ass.composite_risk_score if ass.composite_risk_score else 0 %}
+                        {% if score > 70 %}
+                            <span class="px-2.5 py-1 bg-rose-100/80 text-rose-700 rounded border border-rose-200 text-xs font-bold">{{ '%.1f'|format(score) }}% HIGH</span>
+                        {% elif score > 40 %}
+                            <span class="px-2.5 py-1 bg-amber-100/80 text-amber-700 rounded border border-amber-200 text-xs font-bold">{{ '%.1f'|format(score) }}% MED</span>
+                        {% else %}
+                            <span class="px-2.5 py-1 bg-emerald-100/80 text-emerald-700 rounded border border-emerald-200 text-xs font-bold">{{ '%.1f'|format(score) }}% LOW</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        <a href="/assessments/{{ ass.id }}/pdf" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm group" title="Download Official Medical Report" target="_blank">
+                            <i class="fas fa-file-pdf text-lg group-hover:scale-110 transition-transform"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="p-12 text-center text-slate-400">No clinical reports generated yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

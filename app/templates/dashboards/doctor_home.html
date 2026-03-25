@@ -1,0 +1,122 @@
+{% extends "layouts/admin_layout.html" %}
+
+{% block content %}
+<div class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end relative z-10">
+    <div class="mb-4 md:mb-0">
+        <h2 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-500 tracking-tight mb-2">Welcome back, Dr. {{ current_user.last_name }}</h2>
+        <p class="text-slate-500 font-medium">Enterprise Neurology Analytics & AI Assessment Pipeline</p>
+    </div>
+    <div class="flex space-x-4">
+        <button id="exportBtn" class="bg-white/50 backdrop-blur-md border border-white text-slate-700 px-5 py-2.5 rounded-xl font-bold hover:bg-white/80 transition-all shadow-lg shadow-slate-200/50 flex items-center">
+            <i class="fas fa-file-export mr-2 text-indigo-500"></i> Export Analytics
+        </button>
+        <a href="/assessments/new" class="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white px-6 py-2.5 rounded-xl font-bold hover:from-indigo-500 hover:to-indigo-400 transition-all shadow-lg shadow-indigo-500/30 flex items-center hover:-translate-y-0.5">
+            <i class="fas fa-microchip mr-2 text-indigo-200"></i> New Assessment
+        </a>
+    </div>
+</div>
+
+<!-- Key Metrics Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/60 flex flex-col justify-between hover:scale-105 transition-transform duration-300 relative overflow-hidden group">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all"></div>
+        <div class="flex items-center justify-between mb-4 relative z-10">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                <i class="fas fa-users-medical text-xl"></i>
+            </div>
+            <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-full">+12%</span>
+        </div>
+        <div class="relative z-10">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Total Patients</p>
+            <p class="text-4xl font-black text-slate-800 tracking-tight" id="stat-total-patients">--</p>
+        </div>
+    </div>
+    
+    <div class="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/60 flex flex-col justify-between hover:scale-105 transition-transform duration-300 relative overflow-hidden group">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all"></div>
+        <div class="flex items-center justify-between mb-4 relative z-10">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
+                <i class="fas fa-clipboard-check text-xl"></i>
+            </div>
+            <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-full">+4%</span>
+        </div>
+        <div class="relative z-10">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Assessments Today</p>
+            <p class="text-4xl font-black text-slate-800 tracking-tight">14</p>
+        </div>
+    </div>
+    
+    <div class="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/60 flex flex-col justify-between hover:scale-105 transition-transform duration-300 relative overflow-hidden group">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/20 transition-all"></div>
+        <div class="flex items-center justify-between mb-4 relative z-10">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center text-white shadow-lg shadow-rose-500/30 animate-bounce">
+                <i class="fas fa-exclamation-triangle text-xl"></i>
+            </div>
+            <span class="text-xs font-bold text-rose-600 bg-rose-100 px-2.5 py-1 rounded-full">+2 New</span>
+        </div>
+        <div class="relative z-10">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">High Risk Alerts</p>
+            <p class="text-4xl font-black text-rose-600 tracking-tight">3</p>
+        </div>
+    </div>
+    
+    <div class="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/60 flex flex-col justify-between hover:scale-105 transition-transform duration-300 relative overflow-hidden group">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all"></div>
+        <div class="flex items-center justify-between mb-4 relative z-10">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/30">
+                <i class="fas fa-brain text-xl"></i>
+            </div>
+            <span class="text-xs font-bold text-indigo-600 bg-indigo-100 px-2.5 py-1 rounded-full">Optimal</span>
+        </div>
+        <div class="relative z-10">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Avg AI Confidence</p>
+            <p class="text-4xl font-black text-slate-800 tracking-tight">94.2%</p>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/60 lg:col-span-2 relative overflow-hidden group">
+        <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-all pointer-events-none"></div>
+        <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center"><i class="fas fa-chart-line text-indigo-500 mr-2"></i> Patient Risk Trajectory <span class="ml-2 text-xs font-normal text-slate-400">Temporal AI Analysis</span></h3>
+        <div class="relative h-72 w-full">
+            <canvas id="riskTrajectoryChart"></canvas>
+        </div>
+    </div>
+    
+    <div class="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/60 relative overflow-hidden group">
+        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-rose-500/5 rounded-full blur-3xl group-hover:bg-rose-500/10 transition-all pointer-events-none"></div>
+        <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center"><i class="fas fa-chart-pie text-rose-500 mr-2"></i> Risk Distribution</h3>
+        <div class="relative h-64 w-full flex justify-center">
+            <canvas id="riskDistributionChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Patient List Table -->
+<div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/60 overflow-hidden relative">
+    <div class="flex items-center justify-between p-6 border-b border-white/40 bg-white/40">
+        <h3 class="text-lg font-bold text-slate-800 flex items-center"><i class="fas fa-users text-indigo-500 mr-2"></i> Assigned Patients <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-indigo-100 bg-indigo-600 rounded-full" id="table-count">...</span></h3>
+        <a href="/patients" class="text-indigo-600 font-bold text-sm hover:text-indigo-800 transition-colors bg-indigo-50 px-4 py-2 rounded-lg hover:bg-indigo-100">View All Directory &rarr;</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse cursor-pointer">
+            <thead class="bg-slate-50/50 backdrop-blur-md text-slate-500 uppercase text-xs font-bold tracking-wider border-b border-slate-200/50">
+                <tr>
+                    <th class="py-4 px-6">Patient ID / Auth UUID</th>
+                    <th class="py-4 px-6">Identity</th>
+                    <th class="py-4 px-6">Demographics</th>
+                    <th class="py-4 px-6">Last Assessment</th>
+                    <th class="py-4 px-6">Baseline UPDRS Risk</th>
+                    <th class="py-4 px-6 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody id="patient-table-body" class="text-sm text-slate-700 divide-y divide-slate-100/50 bg-white/20">
+                <!-- Data injected by JS -->
+                <tr><td colspan="6" class="p-12 text-center text-slate-400"><i class="fas fa-circle-notch fa-spin text-3xl mb-4 text-indigo-300"></i><br>Syncing enterprise database payloads...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

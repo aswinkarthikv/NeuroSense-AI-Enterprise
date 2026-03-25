@@ -1,0 +1,338 @@
+{% extends "layouts/admin_layout.html" %}
+
+{% block content %}
+<div class="mb-8 pl-2">
+    <h2 class="text-3xl font-bold text-slate-800 tracking-tight">New Diagnostic Session</h2>
+    <p class="text-slate-500 mt-1">Multi-modal data acquisition protocol.</p>
+</div>
+
+<!-- Wizard Stepper -->
+<div class="mb-8">
+    <div class="flex items-center justify-between w-full relative">
+        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-slate-200 z-0"></div>
+        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-1/4 h-1 bg-indigo-600 transition-all duration-500 z-0" id="progress-bar"></div>
+        
+        <div class="relative z-10 flex flex-col items-center step-indicator active" data-step="1">
+            <div class="w-10 h-10 rounded-full bg-indigo-600 border-4 border-slate-50 text-white flex items-center justify-center font-bold shadow-md">1</div>
+            <span class="text-xs font-semibold mt-2 text-indigo-700 uppercase tracking-widest">Select Patient</span>
+        </div>
+        <div class="relative z-10 flex flex-col items-center step-indicator" data-step="2">
+            <div class="w-10 h-10 rounded-full bg-slate-200 border-4 border-slate-50 text-slate-500 flex items-center justify-center font-bold shadow-sm transition-colors duration-300">2</div>
+            <span class="text-xs font-semibold mt-2 text-slate-400 uppercase tracking-widest transition-colors duration-300">Voice Analytics</span>
+        </div>
+        <div class="relative z-10 flex flex-col items-center step-indicator" data-step="3">
+            <div class="w-10 h-10 rounded-full bg-slate-200 border-4 border-slate-50 text-slate-500 flex items-center justify-center font-bold shadow-sm transition-colors duration-300">3</div>
+            <span class="text-xs font-semibold mt-2 text-slate-400 uppercase tracking-widest transition-colors duration-300">Handwriting</span>
+        </div>
+        <div class="relative z-10 flex flex-col items-center step-indicator" data-step="4">
+            <div class="w-10 h-10 rounded-full bg-slate-200 border-4 border-slate-50 text-slate-500 flex items-center justify-center font-bold shadow-sm transition-colors duration-300">4</div>
+            <span class="text-xs font-semibold mt-2 text-slate-400 uppercase tracking-widest transition-colors duration-300">Gait/Video</span>
+        </div>
+        <div class="relative z-10 flex flex-col items-center step-indicator" data-step="5">
+            <div class="w-10 h-10 rounded-full bg-slate-200 border-4 border-slate-50 text-slate-500 flex items-center justify-center font-bold shadow-sm transition-colors duration-300">
+                <i class="fas fa-brain"></i>
+            </div>
+            <span class="text-xs font-semibold mt-2 text-slate-400 uppercase tracking-widest transition-colors duration-300">AI Fusion Engine</span>
+        </div>
+    </div>
+</div>
+
+<!-- Wizard Content Panels -->
+<div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 p-10 relative overflow-hidden min-h-[500px]">
+    
+    <!-- Step 1: Patient Selection -->
+    <div id="step-1" class="wizard-panel">
+        <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center"><i class="fas fa-user-check text-indigo-500 mr-3"></i> Patient Identity Lookup</h3>
+        <div class="max-w-2xl">
+            <label class="block text-sm font-medium text-slate-700 mb-2">Scan UUID Barcode or Search Query</label>
+            <div class="relative mb-8">
+                <input type="text" id="patient-search-input" placeholder="e.g. UUID, Name, or DOB" class="w-full text-lg pl-12 pr-4 py-4 border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all font-mono">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-xl"></i>
+            </div>
+            
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 hidden animate-fade-in" id="patient-found-card">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="h-16 w-16 rounded-full border-4 border-white shadow-md bg-indigo-600 text-white flex items-center justify-center text-2xl font-bold">JD</div>
+                        <div>
+                            <h4 class="text-xl font-bold text-slate-800" id="found-patient-name">John Doe</h4>
+                            <p class="text-sm text-slate-500 font-mono" id="found-patient-id">UUID: 8a6b...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-12 text-right">
+            <button class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-105 transition-all w-48 text-lg" onclick="nextStep(2)">Proceed <i class="fas fa-arrow-right ml-2 text-sm"></i></button>
+        </div>
+    </div>
+
+    <!-- Step 2: Voice -->
+    <div id="step-2" class="wizard-panel hidden">
+        <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center"><i class="fas fa-microphone-alt text-indigo-500 mr-3"></i> Phonation Assessment</h3>
+        <p class="text-slate-600 mb-8 max-w-2xl">Instruct the patient to say the phoneme "Ahhh" for 5 seconds at a constant pitch and volume.</p>
+        
+        <div class="flex flex-col items-center justify-center border-4 border-dashed border-slate-200 bg-slate-50 py-16 rounded-2xl transition-colors hover:border-indigo-300 hover:bg-indigo-50/50 group">
+            <button id="record-btn" class="h-24 w-24 rounded-full bg-rose-500 text-white flex items-center justify-center text-3xl shadow-xl shadow-rose-500/30 hover:scale-110 active:scale-95 transition-all mb-6">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <p class="text-lg font-medium text-slate-700" id="record-status">Click to begin vocal recording protocol</p>
+            <div class="w-64 h-2 bg-slate-200 mt-6 rounded-full overflow-hidden hidden" id="record-progress">
+                <div class="h-full bg-rose-500 w-0 transition-all duration-100" id="record-bar"></div>
+            </div>
+            
+            <div id="audio-success" class="hidden mt-6 flex items-center text-emerald-600 font-bold bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-200">
+                <i class="fas fa-check-circle mr-2 text-xl"></i> High Fidelity Audio Captured (MFCC readiness: 98%)
+            </div>
+        </div>
+        
+        <div class="mt-12 flex justify-between">
+            <button class="text-slate-500 hover:text-slate-800 font-medium px-6 py-3" onclick="nextStep(1)"><i class="fas fa-arrow-left mr-2"></i> Back</button>
+            <button class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-105 transition-all w-48 text-lg" onclick="nextStep(3)">Protocol Next <i class="fas fa-arrow-right ml-2"></i></button>
+        </div>
+    </div>
+
+    <!-- Step 3: Handwriting -->
+    <div id="step-3" class="wizard-panel hidden">
+        <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center"><i class="fas fa-pen-nib text-indigo-500 mr-3"></i> Micrographia & Tremor Test</h3>
+        <p class="text-slate-600 mb-6 max-w-2xl">Patient must draw an Archimedean spiral starting from the center outward.</p>
+        
+        <div class="flex space-x-8">
+            <div class="border-4 border-slate-200 rounded-xl overflow-hidden cursor-crosshair bg-white relative">
+                <!-- Watermark guide -->
+                <div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+                    <i class="fas fa-hurricane text-9xl"></i>
+                </div>
+                <canvas id="drawing-canvas" width="400" height="400" class="relative z-10"></canvas>
+            </div>
+            
+            <div class="flex flex-col space-y-4 justify-center">
+                <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl shadow-sm w-72">
+                    <h4 class="font-bold text-slate-700 text-sm uppercase tracking-wider mb-2">Real-time Telemetry</h4>
+                    <ul class="text-sm font-mono text-slate-600 space-y-2">
+                        <li class="flex justify-between"><span>X,Y Pos:</span> <span id="pos-stat" class="font-bold text-indigo-600">0, 0</span></li>
+                        <li class="flex justify-between"><span>Pressure:</span> <span class="font-bold text-indigo-600">N/A</span></li>
+                        <li class="flex justify-between"><span>Velocity:</span> <span id="vel-stat" class="font-bold text-emerald-600">0 mm/s</span></li>
+                    </ul>
+                </div>
+                
+                <button class="bg-white border-2 border-slate-300 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-50 transition-colors" onclick="clearCanvas()">
+                    <i class="fas fa-eraser mr-2"></i> Clear Canvas
+                </button>
+                <button class="bg-emerald-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-emerald-600/30 hover:bg-emerald-700 transition-colors" onclick="saveCanvas()">
+                    <i class="fas fa-save mr-2"></i> Lock Vector Data
+                </button>
+            </div>
+        </div>
+        
+        <div class="mt-8 flex justify-between">
+            <button class="text-slate-500 hover:text-slate-800 font-medium px-6 py-3" onclick="nextStep(2)"><i class="fas fa-arrow-left mr-2"></i> Back</button>
+            <button class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-105 transition-all w-48 text-lg" onclick="nextStep(4)">Protocol Next <i class="fas fa-arrow-right ml-2"></i></button>
+        </div>
+    </div>
+
+    <!-- Step 4: Gait/Video -->
+    <div id="step-4" class="wizard-panel hidden">
+        <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center"><i class="fas fa-walking text-indigo-500 mr-3"></i> Postural Instability & Gait</h3>
+        <p class="text-slate-600 mb-8 max-w-2xl">Upload a 10-second lateral video clip of the patient walking normally. AI will perform skeletal tracking.</p>
+        
+        <div class="flex flex-col items-center justify-center border-4 border-dashed border-slate-200 bg-slate-50 py-16 rounded-2xl transition-all hover:border-indigo-400">
+            <div class="h-20 w-20 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-500 text-3xl mb-4">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <h4 class="text-lg font-medium text-slate-700 mb-2">Drag & Drop Gait Video</h4>
+            <p class="text-sm text-slate-400 mb-6">Supports MP4, MOV (Max 50MB)</p>
+            
+            <input type="file" id="gait-file" class="hidden" accept="video/*">
+            <button class="bg-white border border-slate-300 text-slate-700 font-bold py-2 px-6 rounded-lg hover:bg-slate-50 transition-colors" onclick="document.getElementById('gait-file').click()">
+                Browse Local Storage
+            </button>
+        </div>
+        
+        <div class="mt-12 flex justify-between">
+            <button class="text-slate-500 hover:text-slate-800 font-medium px-6 py-3" onclick="nextStep(3)"><i class="fas fa-arrow-left mr-2"></i> Back</button>
+            <button class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 hover:scale-105 transition-all w-72 text-lg" onclick="triggerFusion()">Engage AI Fusion <i class="fas fa-microchip ml-2"></i></button>
+        </div>
+    </div>
+
+    <!-- Step 5: Results -->
+    <div id="step-5" class="wizard-panel hidden">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-indigo-50 mb-6 relative">
+                <i class="fas fa-brain text-5xl text-indigo-600 animate-pulse"></i>
+                <svg class="absolute inset-0 w-full h-full text-indigo-200 animate-spin" style="animation-duration: 3s;" fill="transparent" stroke="currentColor" stroke-width="4" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="48" stroke-dasharray="80 300" stroke-linecap="round"></circle>
+                </svg>
+            </div>
+            <h3 class="text-3xl font-bold text-slate-800 mb-2" id="processing-title">Multi-modal AI Fusion Engine Active</h3>
+            <p class="text-slate-500 mb-8 max-w-lg mx-auto" id="processing-subtitle">Computing neural pathways across voice features, handwriting tensor contours, and skeletal gait coordinates...</p>
+        </div>
+        
+        <!-- Processing State (Mocked) -->
+        <div class="max-w-3xl mx-auto space-y-4" id="processing-bars">
+            <div class="bg-slate-50 rounded-lg p-4 border border-slate-100 flex items-center justify-between">
+                <div class="flex items-center"><i class="fas fa-microphone text-indigo-500 w-6 text-center mr-3"></i> Voice Pipeline</div>
+                <div class="text-xs font-bold text-emerald-500">COMPLETE</div>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-4 border border-slate-100 flex items-center justify-between">
+                <div class="flex items-center"><i class="fas fa-pen-nib text-indigo-500 w-6 text-center mr-3"></i> Handwriting Pipeline</div>
+                <div class="text-xs font-bold text-emerald-500">COMPLETE</div>
+            </div>
+            <div class="bg-slate-50 rounded-lg p-4 border border-slate-100 flex items-center justify-between">
+                <div class="flex items-center"><i class="fas fa-walking text-indigo-500 w-6 text-center mr-3"></i> Skeletal Tracker Pipeline</div>
+                <div class="text-xs font-bold text-emerald-500">COMPLETE</div>
+            </div>
+            <div class="bg-indigo-50 rounded-lg p-4 border border-indigo-100 flex items-center justify-between">
+                <div class="flex items-center font-bold text-indigo-900"><i class="fas fa-network-wired text-indigo-600 w-6 text-center mr-3"></i> Mega-Ensemble Classifier</div>
+                <div class="text-xs font-bold text-indigo-600 animate-pulse">EXECUTING TENSORS...</div>
+            </div>
+        </div>
+        
+        <!-- Final Result State (Hidden Initially) -->
+        <div id="final-results" class="hidden max-w-3xl mx-auto mt-8 animate-fade-in text-center">
+            <!-- Content injected via JS -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // JS Logic for the massive wizard
+    function nextStep(step) {
+        // Update bar
+        const perc = [(step-1) * 25];
+        document.getElementById('progress-bar').style.width = `${perc}%`;
+        
+        // Update tabs and content
+        document.querySelectorAll('.step-indicator').forEach(el => {
+            const s = parseInt(el.dataset.step);
+            const circle = el.querySelector('div');
+            const text = el.querySelector('span');
+            
+            if (s < step) {
+                circle.className = 'w-10 h-10 rounded-full border-4 border-slate-50 text-white flex items-center justify-center font-bold shadow-sm bg-emerald-500';
+                circle.innerHTML = '<i class="fas fa-check"></i>';
+                text.className = 'text-xs font-semibold mt-2 text-emerald-600 uppercase tracking-widest';
+            } else if (s === step) {
+                circle.className = 'w-10 h-10 rounded-full border-4 border-slate-50 text-white flex items-center justify-center font-bold shadow-md bg-indigo-600';
+                circle.innerHTML = s === 5 ? '<i class="fas fa-brain"></i>' : s;
+                text.className = 'text-xs font-semibold mt-2 text-indigo-700 uppercase tracking-widest';
+            } else {
+                circle.className = 'w-10 h-10 rounded-full border-4 border-slate-50 text-slate-500 flex items-center justify-center font-bold shadow-sm bg-slate-200 transition-colors duration-300';
+                circle.innerHTML = s === 5 ? '<i class="fas fa-brain"></i>' : s;
+                text.className = 'text-xs font-semibold mt-2 text-slate-400 uppercase tracking-widest transition-colors duration-300';
+            }
+        });
+        
+        document.querySelectorAll('.wizard-panel').forEach(p => p.classList.add('hidden'));
+        document.getElementById(`step-${step}`).classList.remove('hidden');
+        document.getElementById(`step-${step}`).classList.add('animate-fade-in');
+    }
+
+    // Canvas drawing mock logic
+    const canvas = document.getElementById('drawing-canvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        ctx.beginPath();
+        ctx.moveTo(e.offsetX, e.offsetY);
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+        document.getElementById('pos-stat').textContent = `${e.offsetX}, ${e.offsetY}`;
+        document.getElementById('vel-stat').textContent = `${Math.floor(Math.random() * 20 + 10)} mm/s`;
+    });
+
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mouseleave', () => isDrawing = false);
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    
+    function saveCanvas() {} // Mock function
+    
+    // Voice Record Mock
+    document.getElementById('record-btn').addEventListener('click', () => {
+        const status = document.getElementById('record-status');
+        const progress = document.getElementById('record-progress');
+        const bar = document.getElementById('record-bar');
+        
+        status.textContent = "Recording Phonation... Maintain pitch.";
+        progress.classList.remove('hidden');
+        
+        let width = 0;
+        const interval = setInterval(() => {
+            width += 2;
+            bar.style.width = width + '%';
+            if (width >= 100) {
+                clearInterval(interval);
+                status.textContent = "Processing Spectral Audio...";
+                setTimeout(() => {
+                    document.getElementById('audio-success').classList.remove('hidden');
+                    status.textContent = "Ready.";
+                    progress.classList.add('hidden');
+                }, 1000);
+            }
+        }, 100);
+    });
+    
+    // UUID dummy search
+    document.getElementById('patient-search-input').addEventListener('input', (e) => {
+        if(e.target.value.length > 5) {
+            document.getElementById('patient-found-card').classList.remove('hidden');
+        } else {
+            document.getElementById('patient-found-card').classList.add('hidden');
+        }
+    });
+
+    // Final AI Engine Fusion Simulator
+    function triggerFusion() {
+        nextStep(5);
+        setTimeout(() => {
+            document.getElementById('processing-bars').classList.add('hidden');
+            document.getElementById('processing-title').textContent = "Enterprise Intelligence Report Finalized";
+            document.getElementById('processing-subtitle').classList.add('hidden');
+            
+            // Generate Dynamic Enterprise Results
+            const randomScore = (Math.random() * 100).toFixed(1);
+            let riskText, riskClass, explanation;
+            
+            if (randomScore > 70) {
+                riskText = `High Risk Indicator: ${randomScore}%`;
+                riskClass = 'bg-rose-100 text-rose-800 border-rose-300 shadow-rose-200';
+                explanation = 'The massive AI ensemble has detected severe gait asymmetry and micrographia contours matching textbook Parkinsonian pathology.';
+            } else if (randomScore > 40) {
+                riskText = `Moderate Risk Indicator: ${randomScore}%`;
+                riskClass = 'bg-amber-100 text-amber-800 border-amber-300 shadow-amber-200';
+                explanation = 'The AI detected mild irregularities in vocal phonation and handwriting control. Further clinical observation recommended.';
+            } else {
+                riskText = `Low Risk Indicator: ${randomScore}%`;
+                riskClass = 'bg-emerald-100 text-emerald-800 border-emerald-300 shadow-emerald-200';
+                explanation = 'All multimodal signals are within normal healthy ranges. No Parkinsonian pathology detected.';
+            }
+            
+            const resultHTML = `
+                <div class="inline-block px-6 py-2 ${riskClass} font-black text-2xl rounded-full tracking-widest uppercase border shadow-sm mb-6">
+                    ${riskText}
+                </div>
+                <p class="text-slate-700 mb-8">${explanation}</p>
+                
+                <div class="flex space-x-4 justify-center">
+                    <button class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold shadow-lg hover:bg-indigo-700 transition" onclick="window.location.href='/'">Return to Dashboard</button>
+                    <!-- Here we would attach the real assessment UUID, using a mock ID for the demo -->
+                    <a href="/patients" class="bg-emerald-600 text-white px-6 py-3 rounded-lg font-bold shadow-lg hover:bg-emerald-700 transition flex items-center"><i class="fas fa-file-pdf mr-2"></i> View Medical Records</a>
+                </div>
+            `;
+            
+            document.getElementById('final-results').innerHTML = resultHTML;
+            document.getElementById('final-results').classList.remove('hidden');
+        }, 5000); // 5 sec massive tensor computation wait time
+    }
+</script>
+{% endblock %}
